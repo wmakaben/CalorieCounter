@@ -21,34 +21,35 @@
  * THE SOFTWARE.
  */
 
-        package com.example.wmakaben.caloriecounter;
+package com.example.wmakaben.caloriecounter;
 
-        import android.app.Fragment;
-        import android.content.Context;
-        import android.hardware.Camera;
-        import android.os.Bundle;
-        import android.os.Environment;
-        import android.util.Log;
-        import android.view.Display;
-        import android.view.LayoutInflater;
-        import android.view.Surface;
-        import android.view.SurfaceHolder;
-        import android.view.SurfaceView;
-        import android.view.View;
-        import android.view.ViewGroup;
-        import android.view.WindowManager;
-        import android.widget.Button;
-        import android.widget.FrameLayout;
-        import android.widget.ImageView;
-        import android.widget.Toast;
+import android.support.v4.app.Fragment;
+import android.content.Context;
+import android.hardware.Camera;
+import android.hardware.Camera.PictureCallback;
+import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
+import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.Surface;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.Toast;
 
-        import java.io.File;
-        import java.io.FileNotFoundException;
-        import java.io.FileOutputStream;
-        import java.io.IOException;
-        import java.text.SimpleDateFormat;
-        import java.util.Date;
-        import java.util.List;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Take a picture directly from inside the app using this fragment.
@@ -60,6 +61,7 @@
  * Created by Rex St. John (on behalf of AirPair.com) on 3/4/14.
  */
 public class CameraFragment extends Fragment {
+    OnFragmentInteractionListener mCallback;
 
     // Native camera.
     private Camera mCamera;
@@ -105,14 +107,10 @@ public class CameraFragment extends Fragment {
 
         // Create our Preview view and set it as the content of our activity.
         boolean opened = safeCameraOpenInView(view);
-
         if(opened == false){
             Log.d("CameraGuide","Error, Camera failed to open");
             return view;
         }
-
-        FrameLayout preview = (FrameLayout) getActivity().findViewById(R.id.camera_preview);
-        preview.addView(mPreview);
 
         // Trap the capture button.
         Button captureButton = (Button) view.findViewById(R.id.button_capture);
@@ -121,7 +119,8 @@ public class CameraFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         // get an image from the camera
-                        mCamera.takePicture(null, null, mPicture);
+                        //mCamera.takePicture(null, null, mPicture);
+                        mCallback.OnCaptureButtonSelected(mCamera,mPicture);
                     }
                 }
         );
@@ -191,6 +190,15 @@ public class CameraFragment extends Fragment {
             mPreview.mCamera = null;
         }
     }
+
+    public interface OnFragmentInteractionListener{
+        public void OnCaptureButtonSelected(Camera camera, PictureCallback picture);
+    }
+
+    //public interface OnFragmentInteractionListener {
+    //    public void onNavFragmentInteraction(String string);
+    //}
+
 
     /**
      * Surface on which the camera projects it's capture results. This is derived both from Google's docs and the
@@ -436,7 +444,7 @@ public class CameraFragment extends Fragment {
     /**
      * Picture Callback for handling a picture capture and saving it out to a file.
      */
-    private Camera.PictureCallback mPicture = new Camera.PictureCallback() {
+    private PictureCallback mPicture = new PictureCallback() {
 
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
