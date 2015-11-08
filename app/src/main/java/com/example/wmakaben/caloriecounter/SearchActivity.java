@@ -1,6 +1,7 @@
 package com.example.wmakaben.caloriecounter;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v4.app.NavUtils;
@@ -10,6 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,6 +36,19 @@ public class SearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         setupActionBar();
+
+        Button button = (Button)findViewById(R.id.search_button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText e = (EditText)SearchActivity.this.findViewById(R.id.search_keyword);
+                String text = e.getText().toString();
+                if(!text.trim().equals("")){
+                    FoodSearchTask task = new FoodSearchTask();
+                    task.execute(text);
+                }
+            }
+        });
     }
 
     private void setupActionBar() {
@@ -77,39 +94,30 @@ public class SearchActivity extends AppCompatActivity {
         }
 
         @Override
-        protected String doInBackground(byte[]... img){
-            byte[] bm = img[0];
+        protected String doInBackground(String... food){
+            String key = food[0];
             String response = "";
             try{
                 URL url = new URL(IMAGEURL);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("POST");
-                connection.setDoOutput(true);
-                connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + BOUNDARY);
+                connection.setRequestProperty("food", key);
+                connection.setRequestMethod("GET");
+                connection.connect();
 
-                DataOutputStream request = new DataOutputStream(connection.getOutputStream());
-                request.writeBytes(TWOHYPHENS + BOUNDARY + CRLF);
-                request.writeBytes("Content-Disposition: form-data; name=\"" + ATTACHMENTNAME + "\";filename=\"" + ATTACHMENTFILENAME + "\"" + CRLF);
-                request.writeBytes(CRLF);
-                request.write(bm);
-                request.writeBytes(CRLF);
-                request.writeBytes(TWOHYPHENS + BOUNDARY + TWOHYPHENS + CRLF);
-                request.flush();
-                request.close();
-                InputStream responseStream = new BufferedInputStream(connection.getInputStream());
-
-                BufferedReader responseStreamReader = new BufferedReader(new InputStreamReader(responseStream));
-
-                String line = "";
-                StringBuilder stringBuilder = new StringBuilder();
-
-                while ((line = responseStreamReader.readLine()) != null) {
-                    stringBuilder.append(line).append("\n");
+                int status = connection.getResponseCode();
+                switch(status){
+                    case 200:
+                    case 201:
+                        BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                        StringBuilder sb = new StringBuilder();
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            sb.append(line+"\n");
+                        }
+                        br.close();
+                        response =  sb.toString();
                 }
-                responseStreamReader.close();
 
-                response = stringBuilder.toString();
-                responseStream.close();
                 connection.disconnect();
 
             } catch (MalformedURLException e){
@@ -122,26 +130,26 @@ public class SearchActivity extends AppCompatActivity {
         }
 
         protected void onPostExecute(String result){
+            Log.d("TESTING", result);
             if (dialog.isShowing()) {
                 dialog.dismiss();
             }
-            //Log.d("RESULT", result);
             try{
                 JSONObject jObject = new JSONObject(result);
-                if (jObject.getJSONArray("data").length() == 0){
-                    // Start intent for search box.
-                    Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+                if (jObject.length() == 0){
+                    DialogHelper.showDialog( "Error!","Unable to retrieve information at the moment",SearchActivity.this);
+                }
+                else{
+                    Intent intent = new Intent(SearchActivity.this, ResultActivity.class);
+                    intent.putExtra("json", result);
                     startActivity(intent);
-
                 }
                 //Log.d("RESULT", jObject.getJSONArray("data").toString());
-
-
-
 
             }catch(JSONException e){
                 Log.d("onPostExecute", e.getMessage());
             }
         }
     }
+
 }

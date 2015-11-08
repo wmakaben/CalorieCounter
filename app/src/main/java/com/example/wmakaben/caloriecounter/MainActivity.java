@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.On
             if (dialog.isShowing()) {
                 dialog.dismiss();
             }
-            //Log.d("RESULT", result);
+            Log.d("RESULT", result);
             try{
                 JSONObject jObject = new JSONObject(result);
                 if (jObject.getJSONArray("data").length() == 0){
@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.On
                     startActivity(intent);
 
                 }
-                //Log.d("RESULT", jObject.getJSONArray("data").toString());
+                Log.d("RESULT", jObject.getJSONArray("data").toString());
 
 
 
