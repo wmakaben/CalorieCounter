@@ -44,6 +44,17 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -51,6 +62,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Take a picture directly from inside the app using this fragment.
@@ -61,6 +73,8 @@ import java.util.List;
  *
  * Created by Rex St. John (on behalf of AirPair.com) on 3/4/14.
  */
+
+
 public class CameraFragment extends Fragment {
     OnFragmentInteractionListener mCallback;
 
@@ -101,7 +115,8 @@ public class CameraFragment extends Fragment {
      * @param savedInstanceState
      * @return
      */
-    @Override
+
+    //@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_camera, container, false);
@@ -511,5 +526,37 @@ public class CameraFragment extends Fragment {
         DialogHelper.showDialog( "Success!","Your picture has been saved!",getActivity());
 
         return mediaFile;
+    }
+
+    public RequestQueue sendPictureToAPI() {
+        // Put API logic here -- (TODO) add arguments to method
+        RequestQueue rq = Volley.newRequestQueue(this);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, "http://153.104.42.132:8080/api",
+                new Response.Listener<JSONObject>() {
+                  @Override
+                  public void onResponse(JSONObject response) {
+                      JSONArray jsonArray = null;
+                        try {
+                          jsonArray = response.getJSONArray("answer");
+                          for (int i = 0; i < jsonArray.length(); i++) {
+                              System.out.println(i);
+                          }
+                      } catch (JSONException e) {
+                          e.printStackTrace();
+                      }
+
+                    }
+                },
+
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError e) {
+                        Log.e("error from volley", "ello");
+                    }
+                }
+        );
+
+        rq.add(jsonObjectRequest);
+        return rq;
     }
 }
