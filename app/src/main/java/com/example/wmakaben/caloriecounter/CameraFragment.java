@@ -23,6 +23,7 @@
 
 package com.example.wmakaben.caloriecounter;
 
+import android.app.Activity;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.hardware.Camera;
@@ -119,13 +120,27 @@ public class CameraFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         // get an image from the camera
-                        //mCamera.takePicture(null, null, mPicture);
+                        mCamera.takePicture(null, null, mPicture);
                         mCallback.OnCaptureButtonSelected(mCamera,mPicture);
                     }
                 }
         );
 
         return view;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        try {
+            mCallback = (OnFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
     }
 
     /**
@@ -138,6 +153,7 @@ public class CameraFragment extends Fragment {
         releaseCameraAndPreview();
         mCamera = getCameraInstance();
         mCameraView = view;
+        mCamera.setDisplayOrientation(90);
         qOpened = (mCamera != null);
 
         if(qOpened == true){
@@ -331,7 +347,6 @@ public class CameraFragment extends Fragment {
                     Camera.Size previewSize = mPreviewSize;
                     parameters.setPreviewSize(previewSize.width, previewSize.height);
                 }
-
                 mCamera.setParameters(parameters);
                 mCamera.startPreview();
             } catch (Exception e){
@@ -384,11 +399,11 @@ public class CameraFragment extends Fragment {
                         case Surface.ROTATION_0:
                             previewWidth = mPreviewSize.height;
                             previewHeight = mPreviewSize.width;
-                            mCamera.setDisplayOrientation(90);
                             break;
                         case Surface.ROTATION_90:
                             previewWidth = mPreviewSize.width;
                             previewHeight = mPreviewSize.height;
+                            mCamera.setDisplayOrientation(90);
                             break;
                         case Surface.ROTATION_180:
                             previewWidth = mPreviewSize.height;
@@ -397,7 +412,7 @@ public class CameraFragment extends Fragment {
                         case Surface.ROTATION_270:
                             previewWidth = mPreviewSize.width;
                             previewHeight = mPreviewSize.height;
-                            mCamera.setDisplayOrientation(180);
+                            mCamera.setDisplayOrientation(270);
                             break;
                     }
                 }
@@ -444,7 +459,7 @@ public class CameraFragment extends Fragment {
     /**
      * Picture Callback for handling a picture capture and saving it out to a file.
      */
-    private PictureCallback mPicture = new PictureCallback() {
+    public PictureCallback mPicture = new PictureCallback() {
 
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
@@ -478,7 +493,7 @@ public class CameraFragment extends Fragment {
     private File getOutputMediaFile(){
 
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "UltimateCameraGuideApp");
+                Environment.DIRECTORY_PICTURES), "CalorieCounter");
 
         if (! mediaStorageDir.exists()){
             if (! mediaStorageDir.mkdirs()){
