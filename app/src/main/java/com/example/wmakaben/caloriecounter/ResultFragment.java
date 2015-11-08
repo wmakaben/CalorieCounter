@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -25,8 +24,6 @@ import java.util.ArrayList;
  * create an instance of this fragment.
  */
 public class ResultFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
 
     private String json;
@@ -107,6 +104,7 @@ public class ResultFragment extends Fragment {
         public void onFragmentInteraction(Uri uri);
     }
 
+    //TODO: Move to ingredient fragment
     private void getIngredients(){
         ArrayList<Ingredient> ingredientList = new ArrayList<Ingredient>();
         Ingredient ingredient = new Ingredient("Bread", 300, true);
@@ -173,6 +171,5 @@ public class ResultFragment extends Fragment {
             return convertView;
         }
     }
-    
 
 }

@@ -2,15 +2,14 @@ package com.example.wmakaben.caloriecounter;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.hardware.Camera;
-import android.hardware.Camera.PictureCallback;
 import android.os.AsyncTask;
-import android.support.v4.view.ViewPager;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NavUtils;
+import android.support.v4.app.TaskStackBuilder;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,48 +20,55 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 
-public class MainActivity extends AppCompatActivity implements CameraFragment.OnFragmentInteractionListener, HistoryFragment.OnFragmentInteractionListener{
-    public static final String IMAGEURL = "http://153.104.42.132:8080/api";
-    //public static final String IMAGEURL = "http://153.104.123.159:8080/api";
-    public static final String BOUNDARY = "*****";
-    public static final String CRLF = "\r\n";
-    public static final String TWOHYPHENS = "--";
-    public static final String ATTACHMENTNAME = "data";
-    public static final String ATTACHMENTFILENAME = "image.png";
+public class SearchActivity extends AppCompatActivity {
+    public static final String IMAGEURL = "http://153.104.42.132:8080/api/answer";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        CustomPagerAdapter mPagerAdapter;
-        mPagerAdapter = new CustomPagerAdapter(getSupportFragmentManager(), this);
-
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-        viewPager.setAdapter(mPagerAdapter);
+        setContentView(R.layout.activity_search);
+        setupActionBar();
     }
 
-    //public void OnCaptureButtonSelected(Camera camera, PictureCallback picture){
-    public void OnCaptureButtonSelected(byte[] data){
-        ImageUploadTask task = new ImageUploadTask();
-        task.execute(data);
+    private void setupActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            // Show the Up button in the action bar.
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
-
-    public void onRecordSelectedInteraction(String string) {
-        // Do different stuff
-        Log.d("yo",string);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                Intent upIntent = NavUtils.getParentActivityIntent(this);
+                if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
+                    // This activity is NOT part of this app's task, so create a new task
+                    // when navigating up, with a synthesized back stack.
+                    TaskStackBuilder.create(this)
+                            // Add all of this activity's parents to the back stack
+                            .addNextIntentWithParentStack(upIntent)
+                                    // Navigate up to the closest parent
+                            .startActivities();
+                } else {
+                    // This activity is part of this app's task, so simply
+                    // navigate up to the logical parent activity.
+                    NavUtils.navigateUpTo(this, upIntent);
+                }
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
-    private class ImageUploadTask extends AsyncTask<byte[], Void, String>{
+    private class FoodSearchTask extends AsyncTask<String, Void, String> {
 
-        private ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+        private ProgressDialog dialog = new ProgressDialog(SearchActivity.this);
 
         @Override
         protected void onPreExecute(){
@@ -138,5 +144,4 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.On
             }
         }
     }
-    
 }

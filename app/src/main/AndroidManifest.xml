@@ -26,6 +26,14 @@
             android:label="@string/title_activity_result"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
+        <activity android:name=".SearchActivity" >
+            android:label="@string/title_activity_display_message"
+            android:parentActivityName="com.example.wmakaben.caloriecounter.MainActivity" >
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.wmakaben.caloriecounter.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

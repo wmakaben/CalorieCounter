@@ -532,40 +532,9 @@ public class CameraFragment extends Fragment {
 
         //Bitmap bm = BitmapFactory.decodeFile(filePath);
 
-        DialogHelper.showDialog( "Success!","Your picture has been saved!",getActivity());
+        //DialogHelper.showDialog( "Success!","Your picture has been saved!",getActivity());
 
         return mediaFile;
     }
 
-    public RequestQueue sendPictureToAPI() {
-        // Put API logic here -- (TODO) add arguments to method
-        RequestQueue rq = Volley.newRequestQueue(getActivity());
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, "http://153.104.42.132:8080/api",
-                new Response.Listener<JSONObject>() {
-                  @Override
-                  public void onResponse(JSONObject response) {
-                      JSONArray jsonArray = null;
-                        try {
-                          jsonArray = response.getJSONArray("answer");
-                          for (int i = 0; i < jsonArray.length(); i++) {
-                              System.out.println(i);
-                          }
-                      } catch (JSONException e) {
-                          e.printStackTrace();
-                      }
-
-                    }
-                },
-
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError e) {
-                        Log.e("error from volley", "ello");
-                    }
-                }
-        );
-
-        rq.add(jsonObjectRequest);
-        return rq;
-    }
 }
