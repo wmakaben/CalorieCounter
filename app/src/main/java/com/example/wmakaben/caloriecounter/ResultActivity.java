@@ -3,6 +3,8 @@ package com.example.wmakaben.caloriecounter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import java.util.ArrayList;
+
 public class ResultActivity extends AppCompatActivity {
 
     @Override
@@ -10,4 +12,6 @@ public class ResultActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
     }
+
+
 }
