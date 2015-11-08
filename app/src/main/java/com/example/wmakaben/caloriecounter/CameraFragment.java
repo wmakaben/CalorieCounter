@@ -24,6 +24,8 @@
 package com.example.wmakaben.caloriecounter;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.hardware.Camera;
@@ -136,7 +138,7 @@ public class CameraFragment extends Fragment {
                     public void onClick(View v) {
                         // get an image from the camera
                         mCamera.takePicture(null, null, mPicture);
-                        mCallback.OnCaptureButtonSelected(mCamera,mPicture);
+                        //mCallback.OnCaptureButtonSelected(mCamera,mPicture);
                     }
                 }
         );
@@ -223,7 +225,8 @@ public class CameraFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener{
-        public void OnCaptureButtonSelected(Camera camera, PictureCallback picture);
+        //public void OnCaptureButtonSelected(Camera camera, PictureCallback picture);
+        public void OnCaptureButtonSelected(byte[] data);
     }
 
     //public interface OnFragmentInteractionListener {
@@ -491,6 +494,8 @@ public class CameraFragment extends Fragment {
                 fos.write(data);
                 fos.close();
 
+                mCallback.OnCaptureButtonSelected(data);
+
                 // Restart the camera preview.
                 safeCameraOpenInView(mCameraView);
             } catch (FileNotFoundException e) {
@@ -520,8 +525,12 @@ public class CameraFragment extends Fragment {
         // Create a media file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File mediaFile;
-        mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                "IMG_"+ timeStamp + ".jpg");
+        String filePath = mediaStorageDir.getPath() + File.separator + "IMG_" + timeStamp + ".jpg";
+        mediaFile = new File(filePath);
+        //mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+        //        "IMG_"+ timeStamp + ".jpg");
+
+        //Bitmap bm = BitmapFactory.decodeFile(filePath);
 
         DialogHelper.showDialog( "Success!","Your picture has been saved!",getActivity());
 
@@ -530,7 +539,7 @@ public class CameraFragment extends Fragment {
 
     public RequestQueue sendPictureToAPI() {
         // Put API logic here -- (TODO) add arguments to method
-        RequestQueue rq = Volley.newRequestQueue(this);
+        RequestQueue rq = Volley.newRequestQueue(getActivity());
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, "http://153.104.42.132:8080/api",
                 new Response.Listener<JSONObject>() {
                   @Override

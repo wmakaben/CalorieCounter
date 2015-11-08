@@ -5,4 +5,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="camera_fragment_title">Camera</string>
     <string name="history_fragment_title">History</string>
+    <string name="title_activity_result">ResultActivity</string>
+    <string name="title_ingredients">Ingredients</string>
+    <string name="title_calories">Calories</string>
 </resources>
