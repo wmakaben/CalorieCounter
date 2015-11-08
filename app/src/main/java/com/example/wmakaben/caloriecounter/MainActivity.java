@@ -10,12 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -98,6 +93,63 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.On
     public void onRecordSelectedInteraction(String string) {
         // Do different stuff
         Log.d("yo",string);
+    }
+
+    private class ImageUploadTask extends AsyncTask<byte[], Void, String>{
+
+        @Override
+        protected void onPreExecute(){
+
+        }
+
+        @Override
+        protected String doInBackground(byte[]... img){
+            byte[] bm = img[0];
+            String response = "";
+            try{
+                URL url = new URL(IMAGEURL);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setDoOutput(true);
+                connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + BOUNDARY);
+
+                DataOutputStream request = new DataOutputStream(connection.getOutputStream());
+                request.writeBytes(TWOHYPHENS + BOUNDARY + CRLF);
+                request.writeBytes("Content-Disposition: form-data; name=\"" + ATTACHMENTNAME + "\";filename=\"" + ATTACHMENTFILENAME + "\"" + CRLF);
+                request.writeBytes(CRLF);
+                request.write(bm);
+                request.writeBytes(CRLF);
+                request.writeBytes(TWOHYPHENS + BOUNDARY + TWOHYPHENS + CRLF);
+                request.flush();
+                request.close();
+                InputStream responseStream = new BufferedInputStream(connection.getInputStream());
+
+                BufferedReader responseStreamReader = new BufferedReader(new InputStreamReader(responseStream));
+
+                String line = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ((line = responseStreamReader.readLine()) != null) {
+                    stringBuilder.append(line).append("\n");
+                }
+                responseStreamReader.close();
+
+                response = stringBuilder.toString();
+                responseStream.close();
+                connection.disconnect();
+
+            } catch (MalformedURLException e){
+                Log.d("MainActivity", "MalformedURLException: " + e.getMessage());
+            } catch (IOException e){
+                Log.d("MainActivity", "IOException: " + e.getMessage());
+            }
+
+            return response;
+        }
+
+        protected void onPostExecute(String result){
+            Log.d("RESULT", result);
+        }
     }
     
 }
