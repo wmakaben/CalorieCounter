@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">CalorieCounter</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="camera_fragment_title">Camera</string>
+    <string name="history_fragment_title">History</string>
+</resources>
